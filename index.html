@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>SOUTHERN PHOENIX - By KIE ฉก.ร.25</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@700&family=Michroma&family=Sarabun:wght@400;700&display=swap" rel="stylesheet">
@@ -13,42 +13,57 @@
     <script src="https://cdn.jsdelivr.net/npm/mgrs@1.0.0/dist/mgrs.min.js"></script>
     <style>
         :root { --primary: #ff0000; --dark: #0a0a0a; --card: #161616; --text: #e0e0e0; }
-        body { font-family: 'Sarabun', sans-serif; margin: 0; background: var(--dark); color: var(--text); display: flex; height: 100vh; overflow: hidden; }
-        .sidebar { width: 440px; padding: 12px; overflow-y: hidden; display: flex; flex-direction: column; gap: 8px; border-right: 2px solid #333; z-index: 1000; background: var(--dark); }
+        body { font-family: 'Sarabun', sans-serif; margin: 0; background: var(--dark); color: var(--text); display: flex; flex-direction: row; height: 100vh; overflow: hidden; }
+        
+        /* Responsive Sidebar */
+        .sidebar { width: 420px; padding: 10px; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; border-right: 2px solid #333; z-index: 1000; background: var(--dark); flex-shrink: 0; }
         #map { flex: 1; height: 100%; background: #222; }
-        .brand-header { padding: 12px 0; border-bottom: 2px solid #333; text-align: center; background: #000; border-radius: 8px; }
-        #txt-southern { font-family: 'Syncopate', sans-serif; font-size: 0.95rem; letter-spacing: 10px; display: block; margin-right: -10px; text-transform: uppercase; font-weight: 700; }
+
+        @media (max-width: 850px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; height: 60%; border-right: none; border-bottom: 2px solid #333; order: 2; }
+            #map { height: 40%; order: 1; }
+        }
+
+        .brand-header { padding: 8px 0; border-bottom: 2px solid #333; text-align: center; background: #000; border-radius: 8px; }
+        #txt-southern { font-family: 'Syncopate', sans-serif; font-size: 0.85rem; letter-spacing: 8px; display: block; margin-right: -8px; text-transform: uppercase; font-weight: 700; }
         .s-red { color: #ff0000; text-shadow: 0 0 10px rgba(255, 0, 0, 0.8); }
         .s-white { color: #ffffff; text-shadow: 0 0 10px rgba(255, 255, 255, 0.8); }
         .s-blue { color: #2979ff; text-shadow: 0 0 10px rgba(41, 121, 255, 0.8); }
-        #txt-phoenix { font-family: 'Michroma', sans-serif; font-size: 1.9rem; display: block; color: var(--primary); -webkit-text-stroke: 1.2px var(--primary); text-shadow: 0 0 15px var(--primary); animation: phoenixPulse 3s infinite ease-in-out; }
-        #txt-bykie { font-family: 'Sarabun', sans-serif; font-size: 0.75rem; font-weight: 700; display: block; color: #ffffff; -webkit-text-stroke: 0.5px #000; text-shadow: 0 0 8px var(--primary); margin-top: -2px; }
-        @keyframes phoenixPulse { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.03); filter: brightness(1.3); } }
-        .display-panel { background: #000; border: 1px solid var(--primary); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+        #txt-phoenix { font-family: 'Michroma', sans-serif; font-size: 1.6rem; display: block; color: var(--primary); -webkit-text-stroke: 1.1px var(--primary); text-shadow: 0 0 15px var(--primary); animation: phoenixPulse 3s infinite ease-in-out; }
+        #txt-bykie { font-family: 'Sarabun', sans-serif; font-size: 0.7rem; font-weight: 700; display: block; color: #ffffff; text-shadow: 0 0 8px var(--primary); margin-top: -2px; }
+        
+        @keyframes phoenixPulse { 0%, 100% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.02); filter: brightness(1.3); } }
+
+        .display-panel { background: #000; border: 1px solid var(--primary); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 5px; }
         .display-row { display: flex; justify-content: space-between; align-items: flex-end; }
-        .val-large { font-size: 1.6rem; font-weight: bold; color: #ffeb3b; line-height: 1; }
+        .val-large { font-size: 1.5rem; font-weight: bold; color: #ffeb3b; line-height: 1; }
         .val-sub { font-size: 1.1rem; font-weight: bold; color: #ff9800; }
         .val-elev { color: #4CAF50; font-weight: bold; font-size: 0.85rem; }
         .label { font-size: 0.65rem; color: #888; text-transform: uppercase; }
-        .correction-banner { background: rgba(255, 235, 59, 0.05); border: 1px dashed var(--primary); padding: 6px; border-radius: 4px; color: #ffeb3b; text-align: center; font-weight: bold; font-size: 0.9rem; width: 100%; box-sizing: border-box; }
+        .correction-banner { background: rgba(255, 235, 59, 0.05); border: 1px dashed var(--primary); padding: 5px; border-radius: 4px; color: #ffeb3b; text-align: center; font-weight: bold; font-size: 0.9rem; width: 100%; box-sizing: border-box; }
+
         .control-card { background: var(--card); padding: 10px; border-radius: 8px; }
-        .input-group { display: flex; align-items: center; gap: 4px; margin-bottom: 4px; }
-        .input-group input { flex: 1; background: #222; border: 1px solid #333; color: white; padding: 6px; border-radius: 4px; font-size: 0.8rem; }
+        .input-group { display: flex; align-items: center; gap: 4px; margin-bottom: 5px; }
+        .input-group input { flex: 1; background: #222; border: 1px solid #333; color: white; padding: 6px; border-radius: 4px; font-size: 0.8rem; min-width: 0; }
+        
         button { cursor: pointer; border-radius: 4px; font-weight: bold; transition: 0.2s; }
         #btn-save { background: var(--primary); color: white; border: none; padding: 10px; width: 100%; font-size: 0.85rem; margin-top: 5px; }
-        .btn-small { background: #333; color: white; border: 1px solid #444; padding: 6px 10px; font-size: 0.75rem; }
+        .btn-small { background: #333; color: white; border: 1px solid #444; padding: 5px 8px; font-size: 0.75rem; }
         .btn-loc { background: #1a237e; border: 1px solid #3f51b5; }
-        .log-container { flex: 1; overflow-y: auto; background: var(--card); padding: 5px; border-radius: 8px; border: 1px solid #222; margin-top: 5px; }
+
+        .log-container { flex: 1; overflow-y: auto; background: var(--card); border-radius: 8px; border: 1px solid #222; margin-top: 5px; min-height: 150px; }
         .log-table { width: 100%; border-collapse: collapse; font-size: 0.7rem; color: #ccc; text-align: center; }
-        .log-table th { padding: 6px; border-bottom: 2px solid #333; color: #888; position: sticky; top: 0; background: var(--card); }
-        .log-table td { padding: 5px 2px; border-bottom: 1px solid #222; }
-        .bottom-controls { background: #000; padding: 8px 12px; border-radius: 8px; border-top: 1px solid #222; display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
+        .log-table th { padding: 8px; border-bottom: 2px solid #333; color: #888; position: sticky; top: 0; background: var(--card); z-index: 10; }
+        .log-table td { padding: 6px 2px; border-bottom: 1px solid #222; }
+
+        .bottom-controls { background: #000; padding: 8px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
         .theme-selector { display: flex; gap: 6px; }
-        .t-dot { width: 14px; height: 14px; border-radius: 50%; border: 1px solid #333; cursor: pointer; }
+        .t-dot { width: 16px; height: 16px; border-radius: 50%; border: 1px solid #333; cursor: pointer; }
         .t-dot.active { border-color: #fff; transform: scale(1.1); box-shadow: 0 0 5px var(--primary); }
-        .lang-btn { background: #222; color: #555; border: 1px solid #333; padding: 2px 8px; font-size: 0.6rem; border-radius: 10px; }
+        .lang-btn { background: #222; color: #888; border: 1px solid #333; padding: 4px 10px; font-size: 0.65rem; border-radius: 12px; }
         .lang-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
-        .del-btn { background: #b71c1c; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; margin-top: 8px; width: 100%; }
+        .del-btn { background: #b71c1c; color: white; border: none; padding: 6px; border-radius: 4px; font-size: 11px; width: 100%; margin-top: 8px; }
         .corr-add { color: #00ff00; font-weight: bold; }
         .corr-sub { color: #ff4444; font-weight: bold; }
     </style>
@@ -69,7 +84,7 @@
         </div>
         <div class="display-row" style="border-top: 1px solid #222; padding-top: 5px;">
             <div><span class="label" id="lbl-sub-info">มุมองศา / ΔH</span><br><span id="azimuthDeg" class="val-sub">0°</span> | <span id="diffElev" class="val-elev">0 ม.</span></div>
-            <div style="flex: 1; padding-left: 20px;"><span class="label" id="lbl-corr-title">การแก้พิกัด (Correction)</span><br><div class="correction-banner" id="correctionText">- Waiting -</div></div>
+            <div style="flex: 1; padding-left: 15px;"><span class="label" id="lbl-corr-title">การแก้พิกัด (Correction)</span><br><div class="correction-banner" id="correctionText">- Waiting -</div></div>
         </div>
     </div>
 
@@ -77,8 +92,8 @@
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <span class="label" id="lbl-gun">📍 ปืน (A) <span id="elevA" class="val-elev">H: 0</span></span>
             <div style="display:flex; gap:4px;">
-                <button class="btn-small" style="padding:2px 6px; font-size:0.6rem;" onclick="getElevations()" id="btn-up-elev">อัปเดตความสูง</button>
-                <button class="btn-small btn-loc" style="padding:2px 6px; font-size:0.6rem;" onclick="findMe()" id="btn-find-me">หาตำแหน่งตัวเอง</button>
+                <button class="btn-small" onclick="getElevations()" id="btn-up-elev">อัปเดตความสูง</button>
+                <button class="btn-small btn-loc" onclick="findMe()" id="btn-find-me">หาตำแหน่งตัวเอง</button>
             </div>
         </div>
         <div class="input-group">
@@ -155,7 +170,7 @@
     const langSet = {
         th: { 
             unit: " ม.", dist: "ระยะเป้าหมาย", az: "มุมยิง (MIL)", sub: "มุมองศา / ΔH", corr: "การแก้พิกัด", 
-            upElev: "อัปเดตความสูง", find: "หาตำแหน่งตัวเอง", save: "💾 บันทึกนัดยิง", del: "ลบหมุด", 
+            upElev: "อัปเดตความสูง", find: "ตำแหน่งฉัน", save: "💾 บันทึกนัดยิง", del: "ลบหมุด", 
             azm: "มุมทิศ", distX: "ระยะจาก A", wait: "- รอคำนวณ -", left: " ปรับซ้าย ", right: " ปรับขวา ", add: " เพิ่ม ", subtr: " ลด ",
             gun: "📍 ปืน (A)", target: "🎯 เป้าหมาย (B)", impact: "💥 จุดตก (C)",
             thShot: "นัด", thAz: "MIL/DEG", thDist: "ระยะ/ΔH", thCorr: "การแก้"
@@ -169,12 +184,10 @@
         }
     };
 
-    const satellite = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', { subdomains:['mt0','mt1','mt2','mt3'], useCache: true, crossOrigin: true, cacheMaxAge: 604800000 });
-    const terrain = L.tileLayer('https://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}', { subdomains:['mt0','mt1','mt2','mt3'], useCache: true, crossOrigin: true, cacheMaxAge: 604800000 });
-    const topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', { useCache: true, crossOrigin: true, cacheMaxAge: 604800000 });
-
+    const satellite = L.tileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', { subdomains:['mt0','mt1','mt2','mt3'] });
+    const terrain = L.tileLayer('https://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}', { subdomains:['mt0','mt1','mt2','mt3'] });
     const map = L.map('map', { center: [13.6608, 100.3054], zoom: 15, layers: [satellite] });
-    L.control.layers({ "Satellite": satellite, "Terrain": terrain, "Topo": topo }).addTo(map);
+    L.control.layers({ "Satellite": satellite, "Terrain": terrain }).addTo(map);
 
     const icon = (c) => new L.Icon({ iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-${c}.png`, iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34] });
     
@@ -183,6 +196,9 @@
     const markerC = L.marker([13.6607, 100.3026], {draggable: true, icon: icon('black')}).addTo(map);
     const ballisticLine = L.polyline([], { color: '#ff0000', weight: 4, dashArray: '10, 10', opacity: 0.8, interactive: true }).addTo(map);
 
+    // Initial load: Start with current location
+    window.onload = () => { findMe(); };
+
     function findMe() {
         if (!navigator.geolocation) return alert("เบราว์เซอร์ไม่รองรับ GPS");
         navigator.geolocation.getCurrentPosition(pos => {
@@ -190,20 +206,10 @@
             markerA.setLatLng([latitude, longitude]);
             map.flyTo([latitude, longitude], 17);
             calculate();
-        }, () => alert("ไม่สามารถระบุตำแหน่งได้"));
+        }, () => console.log("GPS Denied"));
     }
 
-    function searchMGRS(p) {
-        const val = document.getElementById('mgrs'+p).value;
-        try {
-            const lonlat = mgrs.toPoint(val);
-            let m = (p==='A')?markerA:(p==='B')?markerB:markerC;
-            m.setLatLng([lonlat[1], lonlat[0]]);
-            map.flyTo([lonlat[1], lonlat[0]], 17);
-            calculate();
-        } catch(e) { alert("MGRS Invalid"); }
-    }
-
+    // --- RE-IMPLEMENTING POINT ON PATH (MOUDLE FROM ORIGINAL) ---
     function getNearestPointOnLine(pt, start, end) {
         const x1 = start.lng, y1 = start.lat, x2 = end.lng, y2 = end.lat, px = pt.lng, py = pt.lat;
         const dx = x2 - x1, dy = y2 - y1;
@@ -229,18 +235,30 @@
         const bear = (Math.atan2(Math.sin((pX.lng-pA.lng)*Math.PI/180)*Math.cos(pX.lat*Math.PI/180), Math.cos(pA.lat*Math.PI/180)*Math.sin(pX.lat*Math.PI/180)-Math.sin(pA.lat*Math.PI/180)*Math.cos(pX.lat*Math.PI/180)*Math.cos((pX.lng-pA.lng)*Math.PI/180)) * 180 / Math.PI + 360) % 360;
         const s = langSet[currentLang];
         let mgrsString = "N/A"; try { mgrsString = mgrs.forward([pX.lng, pX.lat]); } catch(e) {}
-        const content = `<div style="min-width:180px; font-family:'Sarabun'"><b>Point on Path</b><hr style="margin:4px 0"><b>MGRS:</b> <span style="color:#ffeb3b">${mgrsString}</span><br><b>Lat:</b> ${pX.lat.toFixed(6)}<br><b>Lon:</b> ${pX.lng.toFixed(6)}<br><hr style="margin:4px 0">${s.distX}: ${dist} ${s.unit}<br>${s.azm}: ${Math.round(bear * 17.7778)} MIL / ${bear.toFixed(1)}°<br><button class="del-btn" onclick="removeMarker(this)">${s.del}</button></div>`;
+        const content = `<div style="min-width:180px; font-family:'Sarabun'"><b>ตำแห่งโดรนตรวจการณ์</b><hr style="margin:4px 0"><b>MGRS:</b> <span style="color:#ffeb3b">${mgrsString}</span><br><b>Lat:</b> ${pX.lat.toFixed(6)}<br><b>Lon:</b> ${pX.lng.toFixed(6)}<br><hr style="margin:4px 0">${s.distX}: ${dist} ${s.unit}<br>${s.azm}: ${Math.round(bear * 17.7778)} MIL / ${bear.toFixed(1)}°<br><button class="del-btn" onclick="removeMarker(this)">${s.del}</button></div>`;
         m.bindPopup(content).openPopup();
     }
 
     window.removeMarker = function(btn) {
         map.eachLayer(layer => { if (layer instanceof L.Marker && layer.getPopup() && layer.getPopup().isOpen()) map.removeLayer(layer); });
     };
+    // --- END OF POINT ON PATH ---
+
+    function searchMGRS(p) {
+        const val = document.getElementById('mgrs'+p).value;
+        try {
+            const lonlat = mgrs.toPoint(val);
+            let m = (p==='A')?markerA:(p==='B')?markerB:markerC;
+            m.setLatLng([lonlat[1], lonlat[0]]);
+            map.flyTo([lonlat[1], lonlat[0]], 17);
+            calculate();
+        } catch(e) { alert("MGRS Invalid"); }
+    }
 
     async function getElevations() {
         const pts = [markerA.getLatLng(), markerB.getLatLng()];
         try {
-            const res = await fetch(`https://api.open-elevation.com/api/v1/lookup?locations=${pts.map(p => `${p.lat},${p.lng}`).join(' | ')}`);
+            const res = await fetch(`https://api.open-elevation.com/api/v1/lookup?locations=${pts.map(p => `${p.lat},${p.lng}`).join('|')}`);
             const data = await res.json();
             elevData.A = data.results[0].elevation;
             elevData.B = data.results[1].elevation;
@@ -257,6 +275,7 @@
         const bAB = (Math.atan2(Math.sin((pB.lng-pA.lng)*Math.PI/180)*Math.cos(pB.lat*Math.PI/180), Math.cos(pA.lat*Math.PI/180)*Math.sin(pB.lat*Math.PI/180)-Math.sin(pA.lat*Math.PI/180)*Math.cos(pB.lat*Math.PI/180)*Math.cos((pB.lng-pA.lng)*Math.PI/180)) * 180 / Math.PI + 360) % 360;
         const dAC = map.distance(pA, pC);
         const bAC = (Math.atan2(Math.sin((pC.lng-pA.lng)*Math.PI/180)*Math.cos(pC.lat*Math.PI/180), Math.cos(pA.lat*Math.PI/180)*Math.sin(pC.lat*Math.PI/180)-Math.sin(pA.lat*Math.PI/180)*Math.cos(pC.lat*Math.PI/180)*Math.cos((pC.lng-pA.lng)*Math.PI/180)) * 180 / Math.PI + 360) % 360;
+        
         const latDrift = dAC * Math.sin((bAC - bAB) * Math.PI / 180);
         const rangeDiff = (dAC * Math.cos((bAC - bAB) * Math.PI / 180)) - dAB;
         const diffH = elevData.B - elevData.A;
@@ -276,14 +295,13 @@
         document.getElementById('distAB').innerText = window.lastRawData.dist;
         document.getElementById('azimuthMil').innerText = window.lastRawData.mil;
         document.getElementById('azimuthDeg').innerText = window.lastRawData.deg + "°";
-        document.getElementById('diffElev').innerText = `${diffH > 0 ? '↗️' : '↘️'} ${Math.abs(diffH)} ${s.unit}`;
+        document.getElementById('diffElev').innerText = `${diffH >= 0 ? '↗️' : '↘️'} ${Math.abs(diffH)} ${s.unit}`;
         
         const driftText = `${latDrift > 0 ? s.left : s.right}${Math.abs(latDrift).toFixed(1)}${s.unit}`;
         const rangeClass = rangeDiff > 0 ? 'corr-sub' : 'corr-add';
         const rangeSign = rangeDiff > 0 ? ' - ' : ' + ';
-        const rangeWord = rangeDiff > 0 ? s.subtr : s.add;
-        const rangeText = `<span class="${rangeClass}">${rangeSign}${Math.abs(rangeDiff).toFixed(1)}${s.unit} (${rangeWord})</span>`;
-        document.getElementById('correctionText').innerHTML = dAB > 0 ? `${driftText}  |  ${rangeText}` : s.wait;
+        const rangeText = `<span class="${rangeClass}">${rangeSign}${Math.abs(rangeDiff).toFixed(1)}${s.unit}</span>`;
+        document.getElementById('correctionText').innerHTML = dAB > 0 ? `${driftText} | ${rangeText}` : s.wait;
         updateTable();
     }
 
@@ -295,34 +313,25 @@
     }
 
     function setLang(lang) {
-        currentLang = lang; 
+        currentLang = lang;
         document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
         document.getElementById('lang-'+lang).classList.add('active');
-        
-        const s = langSet[lang]; 
-        // Display Panel
-        document.getElementById('lbl-dist-main').innerText = s.dist; 
+        const s = langSet[lang];
+        document.getElementById('lbl-dist-main').innerText = s.dist;
         document.getElementById('lbl-az-main').innerText = s.az;
         document.getElementById('lbl-sub-info').innerHTML = s.sub;
         document.getElementById('lbl-corr-title').innerText = s.corr;
         document.getElementById('unit-dist').innerText = s.unit;
-
-        // Control Panel Labels
         document.getElementById('lbl-gun').childNodes[0].nodeValue = s.gun + " ";
         document.getElementById('lbl-target').childNodes[0].nodeValue = s.target + " ";
         document.getElementById('lbl-impact').innerText = s.impact;
-        
-        // Buttons
-        document.getElementById('btn-up-elev').innerText = s.upElev; 
+        document.getElementById('btn-up-elev').innerText = s.upElev;
         document.getElementById('btn-find-me').innerText = s.find;
-        document.getElementById('btn-save').innerText = s.save; 
-
-        // Table Headers
+        document.getElementById('btn-save').innerText = s.save;
         document.getElementById('th-shot').innerText = s.thShot;
         document.getElementById('th-az').innerText = s.thAz;
         document.getElementById('th-dist').innerText = s.thDist;
         document.getElementById('th-corr').innerText = s.thCorr;
-
         calculate();
     }
 
@@ -333,13 +342,24 @@
     }
 
     function addToLog() { logCount++; shotHistory.unshift({ id: logCount, data: {...window.lastRawData} }); updateTable(); }
+    
     function updateTable() {
         const tbody = document.getElementById('logTable').tBodies[0]; tbody.innerHTML = "";
         const s = langSet[currentLang];
         shotHistory.forEach(shot => {
             const row = tbody.insertRow(); const d = shot.data;
-            row.innerHTML = `<td>${shot.id}</td><td>${d.mil}/${d.deg}°</td><td>${d.dist}${s.unit} / ${d.diffH}${s.unit}</td><td>${d.isLeft?s.left:s.right}${d.driftVal} | ${d.isSub?' - ':' + '}${d.rangeVal}</td>`;
+            row.innerHTML = `<td>${shot.id}</td><td>${d.mil}/${d.deg}°</td><td>${d.dist}${s.unit}/${d.diffH}${s.unit}</td><td>${d.isLeft?s.left:s.right}${d.driftVal} | ${d.isSub?'-':'+'}${d.rangeVal}</td>`;
         });
+    }
+
+    function exportPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const s = langSet[currentLang];
+        doc.setFontSize(18); doc.text("SOUTHERN PHOENIX LOG", 14, 20);
+        const rows = shotHistory.map(h => [h.id, `${h.data.mil}/${h.data.deg}`, `${h.data.dist}/${h.data.diffH}`, `${h.data.isLeft?'L':'R'}${h.data.driftVal} | ${h.data.isSub?'-':'+'}${h.data.rangeVal}`]);
+        doc.autoTable({ head: [[s.thShot, s.thAz, s.thDist, s.thCorr]], body: rows, startY: 30 });
+        doc.save(`ShotLog_${new Date().getTime()}.pdf`);
     }
 
     [markerA, markerB, markerC].forEach(m => m.on('drag', calculate));
